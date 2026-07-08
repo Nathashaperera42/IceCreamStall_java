@@ -1,0 +1,125 @@
+digraph IceCreamStall {
+  rankdir=TB;
+  graph [fontname="Helvetica", fontsize=11, labelloc="t",
+         label="Custom Ice Cream Stall Management System - Class Diagram\n(All classes prefixed with student ID K2533109_)", splines=true, nodesep=0.35, ranksep=0.7];
+  node [shape=record, fontname="Helvetica", fontsize=9, style=filled, fillcolor=white, color="#555555"];
+  edge [fontname="Helvetica", fontsize=8, color="#444444"];
+
+  /* ===================== DECORATOR ===================== */
+  subgraph cluster_dec {
+    label="DECORATOR PATTERN  (ice cream customisation pricing)"; style=filled; color="#F6C6D6"; fontname="Helvetica-Bold"; fontsize=10;
+    IceCreamComponent [label="{\<\<interface\>\>\nK2533109_IceCreamComponent|+ getDescription(): String\l+ getCost(): double\l}"];
+    BaseIceCream [label="{K2533109_BaseIceCream|- base: BaseType\l- flavor: Flavor\l|+ getDescription(): String\l+ getCost(): double\l}"];
+    IceCreamDecorator [label="{K2533109_IceCreamDecorator\n(abstract)|# inner: IceCreamComponent\l|+ getDescription(): String\l+ getCost(): double\l}"];
+    ToppingDecorator [label="{K2533109_ToppingDecorator|- topping: Topping\l|+ getDescription()\l+ getCost()\l}"];
+    SauceDecorator [label="{K2533109_SauceDecorator|- sauce: Sauce\l|+ getDescription()\l+ getCost()\l}"];
+    PackagingDecorator [label="{K2533109_PackagingDecorator|- packaging: Packaging\l|+ getDescription()\l+ getCost()\l}"];
+  }
+
+  /* ===================== BUILDER ===================== */
+  subgraph cluster_build {
+    label="BUILDER PATTERN  (ordering process)"; style=filled; color="#FCE1B6"; fontname="Helvetica-Bold"; fontsize=10;
+    IceCreamBuilder [label="{K2533109_IceCreamBuilder|- name, base, flavor\l- toppings, sauces\l- packaging, quantity\l|+ withBase(b): Builder\l+ withFlavor(f): Builder\l+ addTopping(t): Builder\l+ addSauce(s): Builder\l+ build(): IceCream\l}"];
+    IceCream [label="{K2533109_IceCream|- name: String\l- quantity: int\l- component: IceCreamComponent\l|+ getUnitPrice(): double\l+ getLineTotal(): double\l+ getDescription(): String\l}"];
+  }
+
+  /* ===================== STATE ===================== */
+  subgraph cluster_state {
+    label="STATE PATTERN  (real-time tracking lifecycle)"; style=filled; color="#C8E6C9"; fontname="Helvetica-Bold"; fontsize=10;
+    OrderState [label="{\<\<interface\>\>\nK2533109_OrderState|+ next(o: Order): void\l+ getName(): String\l+ getCustomerMessage(): String\l+ isTerminal(): boolean\l}"];
+    NewState [label="{K2533109_NewState|+ next(o)\l}"];
+    PreparingState [label="{K2533109_PreparingState|+ next(o)\l}"];
+    ReadyState [label="{K2533109_ReadyState|+ next(o)\l}"];
+    OutForDeliveryState [label="{K2533109_OutForDeliveryState|+ next(o)\l}"];
+    DeliveredState [label="{K2533109_DeliveredState|+ next(o)\l+ isTerminal(): true\l}"];
+  }
+
+  /* ===================== OBSERVER ===================== */
+  subgraph cluster_obs {
+    label="OBSERVER PATTERN  (notifications)"; style=filled; color="#BBDEFB"; fontname="Helvetica-Bold"; fontsize=10;
+    Observer [label="{\<\<interface\>\>\nK2533109_Observer|+ update(source, message)\l}"];
+    Subject [label="{\<\<interface\>\>\nK2533109_Subject|+ addObserver(o)\l+ removeObserver(o)\l+ notifyObservers(s, m)\l}"];
+    CustomerNotifier [label="{K2533109_CustomerNotifier|- inbox: List\l|+ update(s, m)\l}"];
+    KitchenDisplay [label="{K2533109_KitchenDisplay|- feed: List\l|+ update(s, m)\l}"];
+  }
+
+  /* ===================== STRATEGY ===================== */
+  subgraph cluster_strat {
+    label="STRATEGY PATTERN  (payment + promotions)"; style=filled; color="#E1BEE7"; fontname="Helvetica-Bold"; fontsize=10;
+    PaymentStrategy [label="{\<\<interface\>\>\nK2533109_PaymentStrategy|+ pay(amount): boolean\l+ getName(): String\l}"];
+    CardPayment [label="{K2533109_CardPayment|+ pay(amount)\l}"];
+    WalletPayment [label="{K2533109_DigitalWalletPayment|+ pay(amount)\l}"];
+    QRCodePayment [label="{K2533109_QRCodePayment|+ pay(amount)\l}"];
+    DiscountStrategy [label="{\<\<interface\>\>\nK2533109_DiscountStrategy|+ applyDiscount(sub): double\l+ getName(): String\l}"];
+    NoDiscount [label="{K2533109_NoDiscount|+ applyDiscount(sub)\l}"];
+    PercentageDiscount [label="{K2533109_PercentageDiscount|- percent: double\l|+ applyDiscount(sub)\l}"];
+    FlatDiscount [label="{K2533109_FlatDiscount|- amountOff: double\l|+ applyDiscount(sub)\l}"];
+  }
+
+  /* ===================== CORE / SERVICES ===================== */
+  subgraph cluster_core {
+    label="CORE DOMAIN & SERVICES"; style=filled; color="#FFE0B2"; fontname="Helvetica-Bold"; fontsize=10;
+    Order [label="{K2533109_Order\n(State context + Observer subject)|- orderId: String\l- items: List\l- state: OrderState\l- discountStrategy: DiscountStrategy\l- paymentStrategy: PaymentStrategy\l|+ addItem(i)\l+ getSubtotal(): double\l+ getTotal(): double\l+ advance(): void\l+ processPayment(): boolean\l+ notifyObservers(s, m)\l}"];
+    OrderService [label="{K2533109_OrderService|- orders: Map\l- kitchenQueue: Queue\l|+ placeOrder(o): Order\l+ takeNextForKitchen(): Order\l+ findOrder(id): Order\l}"];
+    FeedbackService [label="{K2533109_FeedbackService|- feedbackList: List\l|+ addFeedback(f)\l+ getAverageRating(): double\l}"];
+    PromotionService [label="{K2533109_PromotionService|- subscribers: List\l|+ broadcastPromotion(msg)\l}"];
+    Customer [label="{K2533109_Customer|- customerId, name, contact\l}"];
+    Feedback [label="{K2533109_Feedback|- rating: int\l- comment: String\l|+ stars(): String\l}"];
+    Enums [label="{\<\<enumerations\>\>|K2533109_BaseType\lK2533109_Flavor\lK2533109_Topping\lK2533109_Sauce\lK2533109_Packaging\lK2533109_ServingMethod\l}", fillcolor="#FFF3E0"];
+  }
+
+  /* ===================== GUI ===================== */
+  subgraph cluster_gui {
+    label="PRESENTATION (Java Swing GUI)"; style=filled; color="#D7CCC8"; fontname="Helvetica-Bold"; fontsize=10;
+    MainFrame [label="{K2533109_MainFrame\n(controller + JFrame)|+ goTo(card)\l+ placeAndPay(strategy)\l+ startNewOrder()\l}"];
+    CustomizePanel [label="{K2533109_CustomizePanel|+ build via Builder\l}"];
+    ReviewPanel [label="{K2533109_ReviewPanel|+ choose discount\l}"];
+    PaymentPanel [label="{K2533109_PaymentPanel|+ choose payment\l}"];
+    TrackingPanel [label="{K2533109_TrackingPanel|+ update(s, m)\l}"];
+    FeedbackPanel [label="{K2533109_FeedbackPanel|+ submit feedback\l}"];
+    Main [label="{K2533109_Main|+ main(args)\l}"];
+  }
+
+  /* ===================== RELATIONSHIPS ===================== */
+  // realization (implements) - dashed, empty arrowhead
+  edge [style=dashed, arrowhead=empty];
+  BaseIceCream -> IceCreamComponent;
+  IceCreamDecorator -> IceCreamComponent;
+  NewState -> OrderState; PreparingState -> OrderState; ReadyState -> OrderState;
+  OutForDeliveryState -> OrderState; DeliveredState -> OrderState;
+  CustomerNotifier -> Observer; KitchenDisplay -> Observer; TrackingPanel -> Observer;
+  Order -> Subject; PromotionService -> Subject;
+  CardPayment -> PaymentStrategy; WalletPayment -> PaymentStrategy; QRCodePayment -> PaymentStrategy;
+  NoDiscount -> DiscountStrategy; PercentageDiscount -> DiscountStrategy; FlatDiscount -> DiscountStrategy;
+
+  // inheritance (extends) - solid, empty arrowhead
+  edge [style=solid, arrowhead=empty];
+  ToppingDecorator -> IceCreamDecorator; SauceDecorator -> IceCreamDecorator; PackagingDecorator -> IceCreamDecorator;
+
+  // aggregation / composition - diamonds
+  edge [style=solid, arrowhead=none, arrowtail=odiamond, dir=back];
+  IceCreamDecorator -> IceCreamComponent [label="wraps"];
+  IceCream -> IceCreamComponent [label="has"];
+  Order -> IceCream [label="items *"];
+  OrderService -> Order [label="manages *"];
+  FeedbackService -> Feedback [label="stores *"];
+
+  // associations (uses) - solid open arrow
+  edge [style=solid, arrowhead=vee, arrowtail=none, dir=forward];
+  IceCreamBuilder -> IceCream [label="builds", style=dashed];
+  IceCreamBuilder -> IceCreamDecorator [label="chains", style=dashed];
+  Order -> OrderState [label="state"];
+  Order -> DiscountStrategy [label="discount"];
+  Order -> PaymentStrategy [label="payment"];
+  Order -> Customer [label="placed by"];
+  OrderState -> Order [label="transitions", style=dashed];
+  MainFrame -> OrderService; MainFrame -> FeedbackService; MainFrame -> PromotionService;
+  MainFrame -> CustomizePanel [arrowtail=diamond, dir=back, arrowhead=none];
+  MainFrame -> ReviewPanel [arrowtail=diamond, dir=back, arrowhead=none];
+  MainFrame -> PaymentPanel [arrowtail=diamond, dir=back, arrowhead=none];
+  MainFrame -> TrackingPanel [arrowtail=diamond, dir=back, arrowhead=none];
+  MainFrame -> FeedbackPanel [arrowtail=diamond, dir=back, arrowhead=none];
+  Main -> MainFrame [label="launches"];
+  CustomizePanel -> IceCreamBuilder [style=dashed];
+  TrackingPanel -> Order [style=dashed, label="observes"];
+}

@@ -1,0 +1,20 @@
+digraph FlowA {
+  rankdir=TB; graph [fontname="Helvetica", fontsize=12, labelloc="t", label="Ordering Flow (Part 1 of 2)", ranksep=0.4, nodesep=0.35];
+  node [fontname="Helvetica", fontsize=10, style=filled, fillcolor="#FFF5E9", color="#555555"];
+  edge [fontname="Helvetica", fontsize=9];
+  start  [shape=oval, fillcolor="#E86A92", fontcolor=white, label="Start: open stall app"];
+  custom [shape=box, label="Customise ice cream:\nbase & flavour (Builder);\nadd toppings, sauces,\npackaging (Decorator);\nset quantity & serving"];
+  preview[shape=parallelogram, label="Show live price preview"];
+  review [shape=box, label="Review order summary +\nchoose promotion\n(Discount Strategy)"];
+  confirm[shape=diamond, fillcolor="#FCE1B6", label="Confirm\norder?"];
+  paym   [shape=box, label="Choose payment method\n(Payment Strategy:\nCard / Wallet / QR)"];
+  pay    [shape=box, label="processPayment()\n(mock authorise total)"];
+  paidok [shape=diamond, fillcolor="#FCE1B6", label="Payment\nsuccess?"];
+  A      [shape=circle, fillcolor="#6FC2A6", fontcolor=white, width=0.4, fixedsize=true, label="A"];
+  start->custom->preview->review->confirm;
+  confirm->custom [label="No (edit)"];
+  confirm->paym [label="Yes"];
+  paym->pay->paidok;
+  paidok->paym [label="No (retry)"];
+  paidok->A [label="Yes"];
+}
